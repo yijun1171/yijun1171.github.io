@@ -1,0 +1,673 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  <link href='//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="coding | java | life" />
+
+
+
+  <meta name="keywords" content="intern," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="linux相关磁盘&amp;amp;文件系统文件系统虚拟文件系统(Virtual File System)为上层提供了一个统一的接口,不同的物理设备和文件系统类型对上层来说是透明的.对下层,新的物理设备和文件系统可以直接接入linux,而不必重写或者重新编译程序.尽管内核是c语言编写的,VFS还是用面向对象的思想来实现的.虚拟文件系统中有四个主要对象(模型),他们可以用来描述所有任何一个系统中的特征和行为">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ali-intern-linux&TCP">
+<meta property="og:url" content="http://yijun1171.github.io/2015/05/09/ali-intern-linux-TCP/index.html">
+<meta property="og:site_name" content="Eden">
+<meta property="og:description" content="linux相关磁盘&amp;amp;文件系统文件系统虚拟文件系统(Virtual File System)为上层提供了一个统一的接口,不同的物理设备和文件系统类型对上层来说是透明的.对下层,新的物理设备和文件系统可以直接接入linux,而不必重写或者重新编译程序.尽管内核是c语言编写的,VFS还是用面向对象的思想来实现的.虚拟文件系统中有四个主要对象(模型),他们可以用来描述所有任何一个系统中的特征和行为">
+<meta property="og:image" content="http://yijun1171.github.io/img/VFS.gif">
+<meta property="og:image" content="http://yijun1171.github.io/img/tcpfsm.png">
+<meta property="og:image" content="http://yijun1171.github.io/img/tcp-connRefuse.png">
+<meta property="og:image" content="http://yijun1171.github.io/img/tcp-connTimeout.png">
+<meta property="og:updated_time" content="2015-09-07T15:43:39.352Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ali-intern-linux&TCP">
+<meta name="twitter:description" content="linux相关磁盘&amp;amp;文件系统文件系统虚拟文件系统(Virtual File System)为上层提供了一个统一的接口,不同的物理设备和文件系统类型对上层来说是透明的.对下层,新的物理设备和文件系统可以直接接入linux,而不必重写或者重新编译程序.尽管内核是c语言编写的,VFS还是用面向对象的思想来实现的.虚拟文件系统中有四个主要对象(模型),他们可以用来描述所有任何一个系统中的特征和行为">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> ali-intern-linux&TCP | Eden </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zn-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">Eden</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首頁
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            關於
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            歸檔
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              ali-intern-linux&TCP
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          發表於
+          <time itemprop="dateCreated" datetime="2015-05-09T16:46:10+08:00" content="2015-05-09">
+            2015-05-09
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分類於
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/linux-TCP/" itemprop="url" rel="index">
+                  <span itemprop="name">linux TCP</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h1 id="linux相关">linux相关</h1><h2 id="磁盘&amp;文件系统">磁盘&amp;文件系统</h2><h3 id="文件系统">文件系统</h3><p>虚拟文件系统(Virtual File System)为上层提供了一个<strong>统一的接口</strong>,不同的物理设备和文件系统类型对上层来说是透明的.对下层,新的物理设备和文件系统可以直接接入linux,而不必重写或者重新编译程序.<br><img src="http://yijun1171.github.io/img/VFS.gif" alt="VFS"><br>尽管内核是c语言编写的,VFS还是用<strong>面向对象</strong>的思想来实现的.虚拟文件系统中有四个主要对象(模型),他们可以用来描述所有任何一个系统中的特征和行为.它们用c语言的struct实现,struct中包含了<strong>数据</strong>和<strong>函数指针</strong>(内核调用他们来操纵数据).</p>
+<ol>
+<li>超级块(super block),表示一个已挂载的文件系统,一般存储在磁盘的特定扇区中.</li>
+<li>索引节点(inode),表示一个文件(包括目录,物理设备,普通的文件)的所有元信息.这些信息保存在磁盘中,当访问一个文件时从磁盘读取数据(从元数据区)然后在内存中创建inode(struct).inode的操作<strong>由文件所在的文件系统实现</strong>.</li>
+<li>目录项(dentry),表示一个目录项,它是一个路径的组成部分,提高了通过路径进行文件查找的效率(主要是通过<strong>缓存</strong>避免每次查找都要通过系统调用).它并不对应磁盘中的数据,当用字符串表示一个路径的时候它才会被创建(不需要写回).</li>
+<li>文件对象(file),表示一个进程打开的文件</li>
+</ol>
+<h4 id="访问文件的过程">访问文件的过程</h4><p>file-&gt;dentry-&gt;inode-&gt;data<br>其中dentry和inode的查找都会使用缓存,而inode中保存的文件数据的块号,并且使用<strong>多级索引</strong>.</p>
+<p>注意:目录项(dentry)不是目录,目录(directory)是文件(file)的一种形式</p>
+<h3 id="块设备">块设备</h3><p>块设备是指linux系统中支持<strong>随机访问</strong>固定大小数据块的设备.<br>扇区(sector)是块设备的最小寻址单位,通常是512字节.而软件层面的最小寻址单位则是块(block),块大小通常是512B,1KB,4KB.<br>2.6版本以后,每个block IO request用一个bio structure来表示.每个请求会包括不同位置的块(在不同的页中),bio用一个bio_vec链表来记录请求中所有块的位置,链表节点&lt; page,offset,len &gt;,记录了块在物理页中的具体位置.(其中有一个小细节,bi_idx指向了当前节点的位置,有了这个特性可以跟踪IO请求的完成情况,甚至RAID的IO也是通过它来实现的:) </p>
+<p>inode table还有block和其他一些元数据在分区格式化的时候创建和划分.</p>
+<h3 id="挂载">挂载</h3><p>将文件系统与目录树结合,挂载点是该文件系统的入口.</p>
+<h2 id="常用命令">常用命令</h2><p>用法记录在cheatsheet中,持续保持更新</p>
+<h2 id="shell">shell</h2><p>参考一本评价较高的Bash手册,写了一些测试代码在这里:<a href="https://github.com/yijun1171/shell-learning-notes" target="_blank" rel="external">shell-learning-notes</a></p>
+<h1 id="TCP">TCP</h1><h3 id="状态机">状态机</h3><p><img src="http://yijun1171.github.io/img/tcpfsm.png" alt="state-machine"><br>图片来源:<a href="http://coolshell.cn/articles/11564.html" target="_blank" rel="external">CollShell</a></p>
+<h3 id="建立连接">建立连接</h3><p>TCP建立连接的过程一般经过三步</p>
+<ol>
+<li>client发送SYN</li>
+<li>server返回SYN+ACK</li>
+<li>client返回ACK<br>我们成为<strong>三次握手</strong></li>
+</ol>
+<p>初始序号(ISN)是随时间变化而变化的,这样保证连接重连时,上一个连接在网络中延迟的包不会被错误地解释.</p>
+<p>双方同时打开,可能会出现交换了4个报文的情况(不多见)</p>
+<h3 id="关闭连接">关闭连接</h3><p>TCP关闭连接一般分为4步</p>
+<ol>
+<li>A发送FIN</li>
+<li>B发送ACK</li>
+<li>B发送FIN</li>
+<li>A发送ACK</li>
+</ol>
+<p>从状态转换的角度来说</p>
+<ol>
+<li>A接到上层应用的关闭指令,发送FIN后,转换到<em>FIN_WAIT1</em>状态</li>
+<li>B收到FIN,发送ACK后,转换到<em>CLOSE_WAIT</em>状态.此时连接处于<strong>半关闭</strong>.B仍然可以发送数据,而A通过发送FIN表示自己不再发送数据.</li>
+<li>B接到上层应用的关闭指令后,发送FIN,状态转换到<em>LAST_ACK</em>.</li>
+<li>A收到FIN后,发送最后一个ACK,状态转换到<em>TIME_WAIT</em><br>A在收到最后一个ACK后真正关闭连接<br>B在等待2MSL的时间(并且没有收到A重发的FIN)后真正关闭连接</li>
+</ol>
+<h4 id="Time_wait">Time_wait</h4><p>首先发起关闭的那一方,在发送了最后一个ACK之后,会等待2MSL的时间,这样做的原因:</p>
+<ol>
+<li>保证最后那个ACK一定被对端接收到.如果该ACK丢失,对端会在2MSL时间内重发FIN,保证正常关闭.这样一来一回,时间正好2MSL</li>
+<li>在等待这2MSL时间的过程中,网络中被缓存或者延迟的数据包也会失效.这样保证下一个连接(socket的四元组完全一样)建立的时候,那些数据包不会产生异常的影响.</li>
+</ol>
+<h3 id="复位报文段">复位报文段</h3><p>TCP的标志位中有一个<strong>复位</strong>(RST).它有以下作用:</p>
+<ol>
+<li>到不存在的端口的连接请求,对端会返回一个RST置1的报文,表示端口不可达.<br><img src="http://yijun1171.github.io/img/tcp-connRefuse.png" alt=""></li>
+<li>检测半打开的连接.在没有设置keepalive的情况下,如果server异常断开,client不会察觉,当server恢复时,client向server发送消息,server会返回一个RST,表示之前连接的所有信息已经丢失</li>
+</ol>
+<h3 id="超时处理">超时处理</h3><h4 id="连接建立超时">连接建立超时</h4><p>目的端处于不正常状态,无法响应SYN报文请求(一般是目的端<strong>连接队列</strong>中的连接数超过了<strong>backlog</strong>).请求端间隔一定时间后重发SYN试图重建连接.重传间隔大约是2^n.<br>这是测试时设置大量tcp请求连接,而服务器端吞吐量很小时,无法即时响应SYN,客户端只能持续重传.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//参数10设置了超时时间</span></span><br><span class="line">socket.connect(<span class="keyword">new</span> InetSocketAddress(<span class="string">"127.0.0.1"</span>,<span class="number">9999</span>), <span class="number">10</span>);</span><br></pre></td></tr></table></figure></p>
+<p>当连接建立过程超过如上设置的超时时间,java会抛出SocketTimeoutException异常<br><img src="http://yijun1171.github.io/img/tcp-connTimeout.png" alt="conn-timeout"><br>TCP有一个默认的最大重试等待间隔,大约是75s,超过这个间隔扔无法建立连接,TCP协议本身会停止尝试,向上层说明connection timeout</p>
+<h4 id="读超时">读超时</h4><p>TCP的REVQ没有可读数据时,read操作会阻塞,直到有数据可读或者超时.超时时间通过<code>setSoTimeout()</code>方法设置.当抛出超时异常时,<strong>本socket仍然有效</strong>,只是提示本次读操作超时异常.</p>
+<h3 id="Java中socket常用参数">Java中socket常用参数</h3><ol>
+<li>SO_KEEPALIVE:保活机制,探测的时间间隔参数在内核中设定.该参数会影响所有socket的行为</li>
+<li>SO_RCVBUF &amp; SO_SNDBUF:设置读写缓冲区大小,至少为MSS的4倍(用于3duplicate-ACK,保证快速重传)</li>
+<li>SO_TIMEOUT:设置读超时的时间</li>
+<li>SO_REUSEADDR:<ul>
+<li>监听进程重启时,保证重新绑定之前的端口操作成功.</li>
+<li>允许在同一个端口上启动同一个服务器的多个实例</li>
+</ul>
+</li>
+</ol>
+<p>参考资料:</p>
+<ol>
+<li><a href="http://book.douban.com/subject/5503292/" target="_blank" rel="external">linux内核设计和实现</a></li>
+<li><a href="https://www.ibm.com/developerworks/cn/linux/l-linux-filesystem/" target="_blank" rel="external">Linux文件系统剖析</a></li>
+<li><a href="http://tldp.org/LDP/abs/html/" target="_blank" rel="external">Advanced Bash-Scripting Guide</a></li>
+<li><a href="http://awk.readthedocs.org/en/latest/index.html" target="_blank" rel="external">AWK入门指南</a></li>
+<li><a href="http://book.douban.com/subject/1088054/" target="_blank" rel="external">TCP/IP详解 卷1</a></li>
+<li><a href="http://book.douban.com/subject/4859464/" target="_blank" rel="external">UNIX网络编程 卷1：套接字联网API</a></li>
+<li><a href="http://coolshell.cn/articles/11564.html" target="_blank" rel="external">CoolShell-TCP那点事儿</a></li>
+</ol>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/intern/" rel="tag">#intern</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/05/11/ATF-感悟/" rel="prev">ATF-感悟</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/05/01/ali-intern-java基础整理/" rel="next">ali-intern-java基础整理</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            本站概覽
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/img/images.jpg" alt="Yijun" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Yijun</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">coding | java | life</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">文章</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">分類</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">標籤</span>
+              
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/yijun1171" target="_blank">Github</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#linux相关"><span class="nav-number">1.</span> <span class="nav-text">linux相关</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#磁盘&文件系统"><span class="nav-number">1.1.</span> <span class="nav-text">磁盘&文件系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#文件系统"><span class="nav-number">1.1.1.</span> <span class="nav-text">文件系统</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#访问文件的过程"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">访问文件的过程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#块设备"><span class="nav-number">1.1.2.</span> <span class="nav-text">块设备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#挂载"><span class="nav-number">1.1.3.</span> <span class="nav-text">挂载</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常用命令"><span class="nav-number">1.2.</span> <span class="nav-text">常用命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shell"><span class="nav-number">1.3.</span> <span class="nav-text">shell</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TCP"><span class="nav-number">2.</span> <span class="nav-text">TCP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#状态机"><span class="nav-number">2.0.1.</span> <span class="nav-text">状态机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#建立连接"><span class="nav-number">2.0.2.</span> <span class="nav-text">建立连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关闭连接"><span class="nav-number">2.0.3.</span> <span class="nav-text">关闭连接</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Time_wait"><span class="nav-number">2.0.3.1.</span> <span class="nav-text">Time_wait</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#复位报文段"><span class="nav-number">2.0.4.</span> <span class="nav-text">复位报文段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#超时处理"><span class="nav-number">2.0.5.</span> <span class="nav-text">超时处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#连接建立超时"><span class="nav-number">2.0.5.1.</span> <span class="nav-text">连接建立超时</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#读超时"><span class="nav-number">2.0.5.2.</span> <span class="nav-text">读超时</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java中socket常用参数"><span class="nav-number">2.0.6.</span> <span class="nav-text">Java中socket常用参数</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp; 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yijun</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 強力驅動
+</div>
+
+<div class="theme-info">
+  主題 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+    
+
+  
+
+
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

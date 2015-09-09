@@ -1,0 +1,683 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  <link href='//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="coding | java | life" />
+
+
+
+  <meta name="keywords" content="distributed-system," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="RPC的一些基本概念和基于golang的简单实现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CMU.Distributed-System.Lab1(RPC)">
+<meta property="og:url" content="http://yijun1171.github.io/2014/12/15/golang-RPC/index.html">
+<meta property="og:site_name" content="Eden">
+<meta property="og:description" content="RPC的一些基本概念和基于golang的简单实现">
+<meta property="og:image" content="http://yijun1171.github.io/img/golang-client.jpeg">
+<meta property="og:updated_time" content="2015-09-07T15:43:39.352Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CMU.Distributed-System.Lab1(RPC)">
+<meta name="twitter:description" content="RPC的一些基本概念和基于golang的简单实现">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> CMU.Distributed-System.Lab1(RPC) | Eden </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zn-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">Eden</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首頁
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            關於
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            歸檔
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              CMU.Distributed-System.Lab1(RPC)
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          發表於
+          <time itemprop="dateCreated" datetime="2014-12-15T21:19:19+08:00" content="2014-12-15">
+            2014-12-15
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分類於
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/golang/" itemprop="url" rel="index">
+                  <span itemprop="name">golang</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>RPC的一些基本概念和基于golang的简单实现</p>
+<a id="more"></a>
+<h1 id="RPC">RPC</h1><p><strong>RPC</strong>:Remote Procedure Call 远程过程调用<br>简单解释:在客户端发生的过程调用,却实际操作却在服务器上执行</p>
+<h2 id="工作原理">工作原理</h2><ol>
+<li>客户端应用调用<strong>函数</strong></li>
+<li>该<strong>函数</strong>实际上是桩<strong>(stub)</strong>,它实际上将调用的函数名和参数打包成结构化的数据</li>
+<li>底层将这些打包好的数据以消息的形式,通过网络发送给服务器</li>
+<li>服务器将收到的消息拆包,解析,决定将得到的数据派发给被客户端<strong>请求</strong>的函数去执行</li>
+<li>服务器将执行结果打包发送给客户端</li>
+<li>客户端的<strong>桩</strong>拆包,解析服务器的响应,将执行结果返回给调用者</li>
+</ol>
+<h2 id="同步/异步">同步/异步</h2><p>同步:客户端必须等到以上所有步骤执行完之后才能,代码才能继续向下执行<br>异步:<strong>桩</strong>函数在第3步执行之后,客户端就可以往下继续执行了,调用结果在之后的某个时刻再处理</p>
+<h2 id="和本地过程调用的区别">和本地过程调用的区别</h2><ol>
+<li>运行在不同机器上<ul>
+<li>不共享内存.数据通过网络进行传输</li>
+<li>可能有异构(字节序不一样),或者不同编程语言,运行在不同OS上</li>
+</ul>
+</li>
+<li>需要网络通信<ul>
+<li>可能需要定位服务器(IP)</li>
+<li>需要某种程度上的网络<strong>连接</strong></li>
+<li>需要约定好编解码方式</li>
+</ul>
+</li>
+<li>更容易发生错误<ul>
+<li>丢包,冗余,乱序</li>
+<li>节点失效</li>
+</ul>
+</li>
+<li>需要考虑更多的安全问题<ul>
+<li>需要验证机制</li>
+<li>需要加密机制</li>
+</ul>
+</li>
+</ol>
+<h1 id="分析">分析</h1><p>Lab1的组件分为3部分:</p>
+<ol>
+<li>请求客户端(Request):提交请求,等待服务器给出运算结果</li>
+<li>运算客户端(Worker):初始化,发送<strong>加入</strong>请求给服务器.然后转变角色,成为<strong>server</strong>(概念上的),等待服务器给它分配任务</li>
+<li>服务器(Server):组织所有的任务,维持所有的运算客户端.响应请求客户端,切分任务,指派任务,收集运算结果,给请求客户端发送反馈</li>
+</ol>
+<p>RPC过程:<br>Request –&gt; Server –&gt; Request. 典型的同步RPC<br>Worker –&gt; Server. 同步RPC,但是没有返回值<br>Server –&gt; Worker. Worker在进行运算的时候显然需要异步RPC,以提高服务器的吞吐率</p>
+<h1 id="细节">细节</h1><p>封装(marshaling)约定,我们采用JSON格式<br>使用Go RPC package</p>
+<p>Server端<br>将操作封装成函数:<br><figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *servertype)</span> <span class="title">Operate</span> <span class="params">(args *argtype, reply *argtype)</span> <span class="title">Error</span></span></span><br></pre></td></tr></table></figure></p>
+<p>函数必须对参数进行解码,执行操作,对返回值编码,如果没有错误的话返回nil</p>
+<p>然后必须<strong>注册</strong>对应的<code>servertype</code>.</p>
+<hr>
+<p>Client端<br>同步调用:<br>封装好方法名,参数,返回值,然后等待调用返回<br>异步调用:<br>通过关键字<code>go</code>,异步执行调用,通过<code>channel</code>获取返回值</p>
+<p>Example:</p>
+<h1 id="课程源码解读">课程源码解读</h1><p>课程提供的两个源文件使用channel和mutex两种方法实现了简单的rpc底层通信过程,实现简单,我们主要学习用golang实现的思想和方法</p>
+<h2 id="channel">channel</h2><p>本实例使用简单的channel和goroution,用io模拟网络通信过程,实现toyRPC过程</p>
+<p>Client关键点:<br>使用channel缓存请求和响应,使用select语句对io进行多路复用<br>Call使用channel写入和读取请求<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">func</span> (tc *ToyClient) Call(procNum <span class="typename">int32</span>, arg <span class="typename">int32</span>) <span class="typename">int32</span> &#123;</span><br><span class="line">  done := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="typename">int32</span>) <span class="comment">// for tc.Listener()</span></span><br><span class="line">  tc.requestchan &lt;- RequestChan&#123;Request&#123;<span class="typename">int64</span>(<span class="number">0</span>), procNum, arg&#125;, done&#125; <span class="comment">//将本次请求写入请求缓冲通道</span></span><br><span class="line">  reply := &lt;- done <span class="comment">// 从响应缓冲通道中读取</span></span><br><span class="line">  <span class="keyword">return</span> reply</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">  <span class="keyword">var</span> xid <span class="typename">int64</span></span><br><span class="line">  xid = <span class="number">1</span> <span class="comment">//自增id</span></span><br><span class="line">  pending := <span class="keyword">map</span>[<span class="typename">int64</span>]<span class="keyword">chan</span> <span class="typename">int32</span>&#123;&#125; <span class="comment">//用于缓存已经发出但还没收到响应的请求,channel类型的好处在于将响应的分析过程异步化,不会阻塞底层多路对io的监听</span></span><br><span class="line">  <span class="keyword">select</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> req := &lt;- client.requestchan <span class="comment">//请求缓冲通道</span></span><br><span class="line">      pending[xid] = req.done <span class="comment">// 等待响应信息</span></span><br><span class="line">      wirte(req)</span><br><span class="line">      xid++</span><br><span class="line">    <span class="keyword">case</span> rep := &lt;- client.replychan <span class="comment">//响应信息缓冲通道</span></span><br><span class="line">      pending[rep.Xid] &lt;- Res  <span class="comment">//将响应信息写入通道</span></span><br><span class="line">      <span class="built_in">delete</span>(pending, rep.Xid) <span class="comment">//本次请求收到正常响应,从缓冲区删除</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/img/golang-client.jpeg" alt="client结构图"></p>
+<p>Server关键点:<br>使用channel分离request的接收和response的响应<br>dispatcher<br><figure class="highlight axapta"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">  req := <span class="keyword">server</span>.ReadRequest()</span><br><span class="line">  fn, ok := <span class="keyword">server</span>.handlers[req.ProcNum] <span class="comment">//访问所请求的方法</span></span><br><span class="line">  go func() &#123; <span class="comment">//非阻塞的处理请求</span></span><br><span class="line">    reply := Reply&#123;req.Xid, <span class="number">0</span>&#125;</span><br><span class="line">    <span class="keyword">if</span> ok &#123;</span><br><span class="line">      reply.Res = fn(req.Arg) <span class="comment">//调用方法</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">server</span>.replychan &lt;- reply <span class="comment">//将响应消息写入通道</span></span><br><span class="line">  &#125;()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>writer:专门负责消息的写出<br><figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">  select &#123;</span><br><span class="line">  case rep := &lt;- server.replychan //从channel中读取待写出的响应</span><br><span class="line">  server.WriteReply(<span class="variable">$rep</span>) //写出</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>收获</strong>:利用channel实现的一个简单有效的非阻塞请求处理思想,这也是golang处理并发和异步的精髓</p>
+<h2 id="mutex">mutex</h2><p>使用mutex实现rpc的底层调用<br>这里主要用到了sync包中的互斥锁Mutex和条件变量Cond<br>阅读官方文档:<br><a href="https://golang.org/pkg/sync/#Mutex" target="_blank" rel="external">Mutex</a><br><a href="https://golang.org/pkg/sync/#Cond" target="_blank" rel="external">Cond</a><br>Mutex的两个导出方法:<br><em>Lock</em>:加锁,当该锁已经被其他goroutine所持有时,调用者会被挂起<br><em>Unlock</em>:释放锁<br>有一句很重要的解释:Mutex的所有权不在加锁的goroutione上,它允许其他goroutine去释放锁</p>
+<p>Cond<br>每个条件变量使用跟一个锁相关联(<strong>Mutex</strong>或者<strong>RWMutex</strong>)<br>导出方法:<br><em>NewCond</em>:使用互斥锁初始化<br><em>Broadcast</em>:唤醒所有挂起的线程,调用时不要求持有锁<br><em>Signal</em>:唤醒一个挂起的线程,调用时不要求持有锁<br><em>Wait</em>:调用Wait时会将持有的锁释放,然后等待其他线程调用<em>Broadcast</em>或者<em>Signal</em>唤醒,被唤醒后,<em>Wait</em>返回之前会将锁锁住,但是Wait第一次恢复时不保证锁被锁住,也就不能假设条件变量为true,因此需要用一个循环去测试条件变量,<br>exampler from doc<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">c</span>.<span class="type">L</span>.<span class="type">Lock</span>()</span><br><span class="line"><span class="keyword">for</span> !condition &#123;</span><br><span class="line">  <span class="built_in">c</span>.<span class="type">Wait</span>()</span><br><span class="line">&#125;</span><br><span class="line">....</span><br><span class="line"><span class="built_in">c</span>.<span class="type">L</span>.<span class="type">Unlock</span>()</span><br></pre></td></tr></table></figure></p>
+<p>与使用<strong>channel</strong>的实现不同,这里使用<strong>Cond</strong>条件变量来表示一次请求是否完成<br><figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="typedef"><span class="keyword">type</span> <span class="type">State</span> struct <span class="container">&#123;</span><br><span class="line">  cond *sync.<span class="type">Cond</span> //请求是否完成</span><br><span class="line">  reply *<span class="type">Reply</span>  //封装响应信息</span><br><span class="line">&#125;</span></span></span><br></pre></td></tr></table></figure></p>
+<p>Client关键点:<br>Call方法</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">func</span> (tc *ToyClient) Call(procNum <span class="typename">int32</span>, arg <span class="typename">int32</span>) <span class="typename">int32</span> &#123;</span><br><span class="line">  tc.mu.Lock() <span class="comment">//全局共享的互斥锁</span></span><br><span class="line">  <span class="keyword">defer</span> tc.mu.Unlock()</span><br><span class="line"></span><br><span class="line">  xid := tc.xid <span class="comment">// allocate a unique xid</span></span><br><span class="line">  tc.xid++</span><br><span class="line">  tc.pending[xid] = &amp;State&#123;sync.NewCond(&amp;tc.mu), <span class="constant">nil</span>&#125; <span class="comment">//每一次调用请求开始,生成一个State表示一次请求的完成状态,使用全局的互斥锁来构造条件变量</span></span><br><span class="line">  req := &amp;Request&#123;xid,procNum, arg&#125;</span><br><span class="line">  tc.WriteRequest(req) <span class="comment">// send to server</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> tc.pending[xid].reply == <span class="constant">nil</span> &#123; <span class="comment">//循环测试条件,没有得到服务器响应,当得到服务器响应时跳出循环</span></span><br><span class="line">    tc.pending[xid].cond.Wait() <span class="comment">//本线程挂起,解开互斥锁,其他线程有机会向服务器发送调用请求</span></span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  r := tc.pending[xid].reply</span><br><span class="line">  <span class="built_in">delete</span>(tc.pending, xid)</span><br><span class="line">  <span class="keyword">return</span> r.Res</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>listener,客户端被创建时,使用go语句调用,专门负责监听响应<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="func"><span class="keyword">func</span> <span class="params">(tc *ToyClient)</span></span> <span class="type">Listener</span>() &#123;</span><br><span class="line">  <span class="keyword">for</span> &#123;</span><br><span class="line">    reply := tc.<span class="type">ReadReply</span>()</span><br><span class="line">    tc.mu.<span class="type">Lock</span>() <span class="comment">//请求锁</span></span><br><span class="line">    entry, ok := tc.pending[reply.<span class="type">Xid</span>] <span class="comment">//获取对应的State.Reply</span></span><br><span class="line">    <span class="keyword">if</span> ok &#123;</span><br><span class="line">      entry.reply = reply;</span><br><span class="line">      entry.cond.<span class="type">Signal</span>() <span class="comment">//唤醒对应挂起的线程,表示本次调用得到响应,Call方法得以返回</span></span><br><span class="line">    &#125;</span><br><span class="line">    tc.mu.<span class="type">Unlock</span>() <span class="comment">//释放锁</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>server关键点<br>dispatcher,同样是server启动时由go语句执行,专门负责调用请求的派发<br><figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">func</span> (ts *ToyServer) Dispatcher() &#123;</span><br><span class="line">  <span class="keyword">for</span> &#123;</span><br><span class="line">    req := ts.ReadRequest()</span><br><span class="line">    ts.mu.Lock() <span class="comment">//全局互斥锁</span></span><br><span class="line">    fn, ok := ts.handlers[req.ProcNum]</span><br><span class="line">    ts.mu.Unlock()</span><br><span class="line">    <span class="keyword">go</span> <span class="keyword">func</span>() &#123; <span class="comment">//非阻塞执行调用</span></span><br><span class="line">      reply := Reply&#123;req.Xid, <span class="number">0</span>&#125;</span><br><span class="line">      <span class="keyword">if</span> ok &#123;</span><br><span class="line">        reply.Res = fn(req.Arg)</span><br><span class="line">      &#125;</span><br><span class="line">      ts.mu.Lock()</span><br><span class="line">      ts.WriteReply(&amp;reply)</span><br><span class="line">      ts.mu.Unlock()</span><br><span class="line">    &#125;()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="两种方法的比较">两种方法的比较</h3><p>channel方式实现更加go style</p>
+<h1 id="rpc_package">rpc package</h1><p>golang提供了rpc的基础包<br>我们在这里使用<a href="https://golang.org/pkg/net/rpc/jsonrpc/" target="_blank" rel="external">jsonrpc</a></p>
+<h2 id="要求">要求</h2><ol>
+<li><p>服务器端,声明一个导出类型作为服务,为该类型声明至少一个导出方法.方法要求:</p>
+<ol>
+<li>方法导出</li>
+<li>有两个参数,都是导出的类型</li>
+<li>第二个参数是指针类型</li>
+<li>返回值是error<br>形如<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t *T)</span><span class="title">MethodName</span><span class="params">(argType T1, replyType *T2)</span> <span class="title">error</span></span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><p>调用<code>rpc.register(service)</code>,将声明的服务的指针注册到rpc上</p>
+</li>
+<li>监听指定端口</li>
+<li>将到达的请求交给指定方法进行解码,这里使用<code>server.ServeCodec(jsonrpc.NewServerCodec(conn))</code></li>
+<li>客户端使用<code>jsonrpc.Dial(netword, address)</code>方法向服务端发起请求</li>
+<li>方法调用时使用<code>rpc.Client</code>的导出方法<code>Call(serviceMethod, args, reply)</code>,其中第三个参数必须是指针类型,注意,serviceMethod必须形如<strong>service.method</strong>,service是服务器端注册服务的类型名,method是调用的方法名</li>
+</ol>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/distributed-system/" rel="tag">#distributed-system</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/12/27/golang-concurrency/" rel="prev">golang-concurrency-学习笔记</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/12/12/CMU-Distributed-System-Lab1/" rel="next">CMU.Distributed-System.Lab1</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            本站概覽
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/img/images.jpg" alt="Yijun" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Yijun</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">coding | java | life</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">文章</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">分類</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">標籤</span>
+              
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/yijun1171" target="_blank">Github</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RPC"><span class="nav-number">1.</span> <span class="nav-text">RPC</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#工作原理"><span class="nav-number">1.1.</span> <span class="nav-text">工作原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#同步/异步"><span class="nav-number">1.2.</span> <span class="nav-text">同步/异步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#和本地过程调用的区别"><span class="nav-number">1.3.</span> <span class="nav-text">和本地过程调用的区别</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分析"><span class="nav-number">2.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#细节"><span class="nav-number">3.</span> <span class="nav-text">细节</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#课程源码解读"><span class="nav-number">4.</span> <span class="nav-text">课程源码解读</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#channel"><span class="nav-number">4.1.</span> <span class="nav-text">channel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mutex"><span class="nav-number">4.2.</span> <span class="nav-text">mutex</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#两种方法的比较"><span class="nav-number">4.2.1.</span> <span class="nav-text">两种方法的比较</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#rpc_package"><span class="nav-number">5.</span> <span class="nav-text">rpc package</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#要求"><span class="nav-number">5.1.</span> <span class="nav-text">要求</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp; 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yijun</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 強力驅動
+</div>
+
+<div class="theme-info">
+  主題 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+    
+
+  
+
+
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

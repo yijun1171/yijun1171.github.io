@@ -1,0 +1,645 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  <link href='//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="coding | java | life" />
+
+
+
+  <meta name="keywords" content="search," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="构建索引一个好的索引构建策略是搜索程序成功的基石">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lucene学习笔记(三)构建索引">
+<meta property="og:url" content="http://yijun1171.github.io/2014/12/07/Lucene学习笔记-三-构建索引/index.html">
+<meta property="og:site_name" content="Eden">
+<meta property="og:description" content="构建索引一个好的索引构建策略是搜索程序成功的基石">
+<meta property="og:updated_time" content="2015-09-07T15:43:39.352Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Lucene学习笔记(三)构建索引">
+<meta name="twitter:description" content="构建索引一个好的索引构建策略是搜索程序成功的基石">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> Lucene学习笔记(三)构建索引 | Eden </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zn-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">Eden</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首頁
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            關於
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            歸檔
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              Lucene学习笔记(三)构建索引
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          發表於
+          <time itemprop="dateCreated" datetime="2014-12-07T17:07:25+08:00" content="2014-12-07">
+            2014-12-07
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分類於
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/java/" itemprop="url" rel="index">
+                  <span itemprop="name">java</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h1 id="构建索引">构建索引</h1><p>一个好的索引构建策略是搜索程序成功的基石<br><a id="more"></a></p>
+<h2 id="对搜索内容进行建模">对搜索内容进行建模</h2><h3 id="文档和域">文档和域</h3><p>Document是索引和搜索的原子单位,Field包含真正的搜索的内容.域中的值会被分析成粒度更小的语汇单元,对这样的语汇单元进行索引.<br>  例如,存在这样的域:<code>&quot;content&quot;:&quot;hello world! i&#39;m new here&quot;</code>,根据不同的分析策略,域值将会被分割成不同的语汇单元的集合,并分别建立索引.假如按照独立的单词进行分别索引,搜索域中任意一个单词,例如<code>new</code>,该文档都会被搜索出来.</p>
+<h3 id="反向规格化">反向规格化</h3><p>  真实的文档之间可能存在嵌套,指向,主次之类的关系,而Lucene的Document都是单一的,为了解决这一矛盾需要进行<strong>反向规格化</strong>操作</p>
+<hr>
+<h2 id="索引过程">索引过程</h2><ol>
+<li>将原始文档转换成文本</li>
+<li>分析文本</li>
+<li>将分析好的文本保存至索引</li>
+</ol>
+<h3 id="提取和转换文本">提取和转换文本</h3><p>  Lucene建立索引需要文本格式的数据内容,所以第一项任务就是从各种各样的数据来源中提取出文本内容.(提取文本信息的细节可以借助<strong>Tika</strong>框架)</p>
+<h3 id="分析文档">分析文档</h3><p>  处理文本内容,例如转换大小写,去除无意义的冠词(针对英语),总之是利用一些过滤和转换手段将文本转换成利于有效索引的语汇单元.分析器可以自己定制也可以使用现成的.</p>
+<h3 id="向索引添加文档">向索引添加文档</h3><p>  Lucene使用反向索引,即一个<em>语汇单元</em>指向所有包含它的<em>文档</em>.</p>
+<h2 id="基本索引操作">基本索引操作</h2><h3 id="添加文档">添加文档</h3><p><code>indexWriter.addDocument(Document)</code> 使用默认分析器<br><code>indexWriter.addDocument(Document,Analyzer)</code> 使用指定分析器</p>
+<h3 id="删除文档">删除文档</h3><p><code>deleteDocument(Term)</code> 删除包含项的所有文档<br><code>deleteDocument(Term[])</code> 删除包含任意项的所有文档<br><code>deleteDocument(Query)</code> 删除满足查询条件的所有文档<br><code>deleteDocument(Query[])</code> 删除满足任一查询条件的所有文档</p>
+<p>如何实现删除单一指定文档?<br>使用类似数据库主键的<strong>Field</strong>来标识每个文档:<code>new Field(&quot;id&quot;,&quot;**&quot;)</code>,id不会重复.</p>
+<h4 id="commit与optimize">commit与optimize</h4><p><code>commit()</code>操作只会标记那些被执行删除操作的文档,当周期性刷新文档目录时才真正删除该文档.</p>
+<p><code>optimize()</code>操作强制删除文档后合并索引</p>
+<h4 id="maxDoc与numDoc">maxDoc与numDoc</h4><p><code>maxDoc()</code>返回被删除和未被删除的文档总数<br><code>numDoc()</code>返回未被删除的文档总数</p>
+<h3 id="更新文档">更新文档</h3><p><code>updateDocument(Term, Document)</code> 首先删除包含Term变量的所有文档,然后使用writer的默认分析器添加新文档</p>
+<hr>
+<h2 id="域选项">域选项</h2><p>4.10版本通过 <code>FieldType</code>对象和它的<code>set()</code>方法来控制域选项</p>
+<h3 id="域索引选项">域索引选项</h3><p>常用选项:<br><code>ANALYZED</code> 将域值分解成独立的语汇单元,使得每个单元都能被搜索<br><code>NOT_ANALYZED</code> 域值整体作为语汇单元,用于精确匹配<br><code>NO</code> 该域不能被搜索<br>4.10中<br>通过<code>FieldType.setTokenized()</code>设置是否将域值分解<br>通过<code>FieldType.setIndex()</code>设置该域值是否建立索引</p>
+<h3 id="域存储选项">域存储选项</h3><p><code>setStored()</code> 如果设置为不保存域值,则该值不会在索引中保存,即搜索完毕后,不可从Document对象中访问.</p>
+<h3 id="域排序选项">域排序选项</h3><p>NumericType</p>
+<h3 id="多值域">多值域</h3><p>以相同的域名添加不同域值<br><figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Document doc = <span class="keyword">new</span> Document();</span><br><span class="line">FieldType <span class="class"><span class="keyword">type</span> </span>= <span class="keyword">new</span> FieldType();</span><br><span class="line"><span class="class"><span class="keyword">type</span>.<span class="title">setIndex</span></span>(<span class="keyword">true</span>);</span><br><span class="line"><span class="class"><span class="keyword">type</span>.<span class="title">setStored</span></span>(<span class="keyword">true</span>);</span><br><span class="line"><span class="keyword">for</span>(String string : authors)&#123;</span><br><span class="line">  doc.add(<span class="keyword">new</span> Field(<span class="string">"author"</span>,string,<span class="class"><span class="keyword">type</span>));      </span></span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="加权">加权</h2><p>Lucene中使用的评分算法是<strong>TF-IDF</strong>(词频-逆文档频率),一个关键字的评分跟它在本文档中出现的频率成正比,跟它在所有文档中出现的频率成反比</p>
+<p>4.x的改动中只能对域进行加权</p>
+<p>对<strong>Field</strong>加权<br><figure class="highlight monkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Field</span> <span class="keyword">field</span> = <span class="keyword">new</span> <span class="keyword">Field</span>(<span class="string">"title"</span>,<span class="string">"process"</span>,type);</span><br><span class="line"><span class="keyword">field</span>.setBoost(<span class="number">10.0</span>f);</span><br></pre></td></tr></table></figure></p>
+<p>要想对文档加权,则必须对每个域进行加权<br>更加具体的评分机制和实现 <a href="http://www.iteye.com/job/topic/1133219" target="_blank" rel="external">Lucene全文检索之评分</a></p>
+<h3 id="加权基准(Norms)">加权基准(Norms)</h3><hr>
+<h2 id="索引数字-日期和时间">索引数字.日期和时间</h2><h3 id="数字">数字</h3><ol>
+<li><p>数字内嵌在文本中,如</p>
+<blockquote>
+<p>“Be sure to include Form 1099 in your tax return”<br>如果想保留数字<code>1099</code>的搜索,可以使用<code>WhitespaceAnalyzer</code>和<code>StandardAnalyzer</code>,他们将<code>1099</code>提取出来并写入索引.</p>
+</blockquote>
+</li>
+<li><p>某个域只包含数字,而希望将其进行精确匹配,使用<code>NumericddDocValuesField</code>类.<br>其子类有: <em>ByteDocValuesField</em>, <em>DoubleDocValuesField</em>, <em>FloatDocValuesField</em>, <em>IntDocValuesField</em>, <em>LongDocValuesField</em>, <em>PackedLongDocValuesField</em>, <em>ShortDocValuesField</em></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dco.add(<span class="keyword">new</span> DoubleDocValueField(<span class="string">"price"</span>,<span class="number">199.9</span>));</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="日期和时间">日期和时间</h3><p>将日期转换成<code>long</code>型,按数值类型保存<br><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">doc</span><span class="class">.add</span>(new <span class="function">NumericDocValueField</span>(<span class="string">"timestamp"</span>,new <span class="function">Date</span>()&#123;&#125;<span class="class">.getTime</span>()));</span><br></pre></td></tr></table></figure></p>
+<p>或者从<code>Calendar</code>实例中获取日期<br><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Calendar <span class="keyword">cal</span> = Calendar.getInstance();</span><br><span class="line"><span class="keyword">cal</span>.setTime(<span class="keyword">new</span> Date());</span><br><span class="line">document.<span class="built_in">add</span>(<span class="keyword">new</span> NumericDocValuesField(<span class="string">"dayOfMonth"</span>,<span class="keyword">cal</span>.<span class="built_in">get</span>(Calendar.DAY_OF_MONTH)));</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="域截取">域截取</h2><p>Lucene4.x中 限制域长度的设置移到了<code>analysis</code>子模块中,参考<code>LimitTokenCountAnalyzer</code></p>
+<h2 id="索引优化">索引优化</h2><p>indexWriter.forceMerge(int maxNumSegments)<br>将索引合并为最多max个段<br>优化期间会占用大量的空间,会产生大量开销<br>了解了索引存储细节后再回头来思考合并优化的原理</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/search/" rel="tag">#search</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/12/08/Lucene学习笔记-四-并发/" rel="prev">Lucene学习笔记(四)并发</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/12/07/Lucene学习笔记-二/" rel="next">Lucene学习笔记(二)</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            本站概覽
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/img/images.jpg" alt="Yijun" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Yijun</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">coding | java | life</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">文章</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">分類</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">標籤</span>
+              
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/yijun1171" target="_blank">Github</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#构建索引"><span class="nav-number">1.</span> <span class="nav-text">构建索引</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#对搜索内容进行建模"><span class="nav-number">1.1.</span> <span class="nav-text">对搜索内容进行建模</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#文档和域"><span class="nav-number">1.1.1.</span> <span class="nav-text">文档和域</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#反向规格化"><span class="nav-number">1.1.2.</span> <span class="nav-text">反向规格化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引过程"><span class="nav-number">1.2.</span> <span class="nav-text">索引过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#提取和转换文本"><span class="nav-number">1.2.1.</span> <span class="nav-text">提取和转换文本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分析文档"><span class="nav-number">1.2.2.</span> <span class="nav-text">分析文档</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#向索引添加文档"><span class="nav-number">1.2.3.</span> <span class="nav-text">向索引添加文档</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本索引操作"><span class="nav-number">1.3.</span> <span class="nav-text">基本索引操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#添加文档"><span class="nav-number">1.3.1.</span> <span class="nav-text">添加文档</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除文档"><span class="nav-number">1.3.2.</span> <span class="nav-text">删除文档</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#commit与optimize"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">commit与optimize</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#maxDoc与numDoc"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">maxDoc与numDoc</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新文档"><span class="nav-number">1.3.3.</span> <span class="nav-text">更新文档</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#域选项"><span class="nav-number">1.4.</span> <span class="nav-text">域选项</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#域索引选项"><span class="nav-number">1.4.1.</span> <span class="nav-text">域索引选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#域存储选项"><span class="nav-number">1.4.2.</span> <span class="nav-text">域存储选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#域排序选项"><span class="nav-number">1.4.3.</span> <span class="nav-text">域排序选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多值域"><span class="nav-number">1.4.4.</span> <span class="nav-text">多值域</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#加权"><span class="nav-number">1.5.</span> <span class="nav-text">加权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#加权基准(Norms)"><span class="nav-number">1.5.1.</span> <span class="nav-text">加权基准(Norms)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引数字-日期和时间"><span class="nav-number">1.6.</span> <span class="nav-text">索引数字.日期和时间</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数字"><span class="nav-number">1.6.1.</span> <span class="nav-text">数字</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#日期和时间"><span class="nav-number">1.6.2.</span> <span class="nav-text">日期和时间</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#域截取"><span class="nav-number">1.7.</span> <span class="nav-text">域截取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引优化"><span class="nav-number">1.8.</span> <span class="nav-text">索引优化</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp; 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yijun</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 強力驅動
+</div>
+
+<div class="theme-info">
+  主題 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+    
+
+  
+
+
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

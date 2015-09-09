@@ -1,0 +1,624 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  <link href='//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="coding | java | life" />
+
+
+
+  <meta name="keywords" content="concurrency," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="golang并发编程学习笔记主要涉及channel goroutine 同步参照阅读&amp;lt;&amp;lt; Go并发编程实战 &amp;gt;&amp;gt;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="golang-concurrency-学习笔记">
+<meta property="og:url" content="http://yijun1171.github.io/2014/12/27/golang-concurrency/index.html">
+<meta property="og:site_name" content="Eden">
+<meta property="og:description" content="golang并发编程学习笔记主要涉及channel goroutine 同步参照阅读&amp;lt;&amp;lt; Go并发编程实战 &amp;gt;&amp;gt;">
+<meta property="og:updated_time" content="2015-09-07T15:43:39.352Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="golang-concurrency-学习笔记">
+<meta name="twitter:description" content="golang并发编程学习笔记主要涉及channel goroutine 同步参照阅读&amp;lt;&amp;lt; Go并发编程实战 &amp;gt;&amp;gt;">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> golang-concurrency-学习笔记 | Eden </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zn-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">Eden</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首頁
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            關於
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            歸檔
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              golang-concurrency-学习笔记
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          發表於
+          <time itemprop="dateCreated" datetime="2014-12-27T14:24:35+08:00" content="2014-12-27">
+            2014-12-27
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分類於
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/golang/" itemprop="url" rel="index">
+                  <span itemprop="name">golang</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h1 id="golang并发编程学习笔记">golang并发编程学习笔记</h1><p>主要涉及channel goroutine 同步<br>参照阅读&lt;&lt; Go并发编程实战 &gt;&gt;</p>
+<a id="more"></a>
+<h1 id="Goroutine">Goroutine</h1><h2 id="使用方法">使用方法</h2><p><strong>go</strong>语句 + 表达式<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> <span class="built_in">println</span>(<span class="string">"Go! Goroutine!"</span>)</span><br><span class="line"><span class="keyword">go</span> <span class="keyword">func</span>() &#123;</span><br><span class="line">  <span class="built_in">println</span>(<span class="string">"Go! Goroutine!"</span>)</span><br><span class="line">&#125;() <span class="comment">//匿名函数</span></span><br></pre></td></tr></table></figure></p>
+<p>runtime.Gosched():使其他Goroutine有机会运行</p>
+<p>一些详细与goroutine交互的函数见官方文档<a href="https://golang.org/pkg/runtime" target="_blank" rel="external">runtime</a></p>
+<h1 id="channel">channel</h1><h2 id="声明">声明</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">chan</span> T</span><br><span class="line"><span class="keyword">type</span> IntChan <span class="keyword">chan</span> <span class="typename">int</span></span><br></pre></td></tr></table></figure>
+<h2 id="操作">操作</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">chan</span>&lt;- v <span class="comment">//写入</span></span><br><span class="line"></span><br><span class="line">val := &lt;-<span class="keyword">chan</span> <span class="comment">//读取</span></span><br><span class="line">val, ok := &lt;-<span class="keyword">chan</span> <span class="comment">//如果通道已经关闭,ok返回false,val返回对应类型的零值</span></span><br><span class="line"><span class="keyword">for</span> e := <span class="keyword">range</span> <span class="keyword">chan</span> &#123; <span class="comment">//对一个双向通道进行读取迭代,通道关闭后并且没有剩余的元素,for语句执行结束</span></span><br><span class="line">  printf(<span class="string">"Element: %v\n"</span>,e)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>个人感觉channel的操作和一个有限缓冲区实现的生产者消费者模型类似,读取操作会在channel空时阻塞,写入操作会在channel满时阻塞.阻塞的Goroutine的唤醒顺序与其阻塞顺序相同,可以理解为一个用于存放阻塞Goroutine的队列</p>
+<p>写入时的值拷贝<br>向通道写入时,写入的是值的一个完全拷贝</p>
+<h2 id="初始化">初始化</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">intChan := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="typename">int</span>, <span class="number">10</span>) <span class="comment">//通道类型 缓冲区大小</span></span><br></pre></td></tr></table></figure>
+<h2 id="关闭">关闭</h2><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">close</span><span class="params">(intChan)</span></span></span><br></pre></td></tr></table></figure>
+<p>通道关闭后不能再向其中写入数据,但接收方可以继续读取数据</p>
+<h2 id="select语句">select语句</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> ch1 = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="typename">int</span>, <span class="number">10</span>)</span><br><span class="line"><span class="keyword">var</span> ch2 = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="typename">string</span>, <span class="number">10</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> &#123;</span><br><span class="line">  <span class="keyword">case</span> e1 := &lt;-ch1:</span><br><span class="line">    ftm.Printf(<span class="string">"1th case is selected. e1=%v\n"</span>, e1)</span><br><span class="line">  <span class="keyword">case</span> e2 := &lt;-ch2:</span><br><span class="line">    ftm.Printf(<span class="string">"2th case is selected. e2=%v\n"</span>, e2)</span><br><span class="line">  <span class="keyword">default</span>:</span><br><span class="line">    ftm.Printf(<span class="string">"default"</span>) </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通道类型不受约束<br>分支选择规则:</p>
+<ol>
+<li>自上而下对每个case求值</li>
+<li>选择可以通道操作可以执行的case,多个case满足的话随机选择一个,都不满足的话执行default</li>
+</ol>
+<p>惯用法<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> <span class="keyword">func</span>() &#123;</span><br><span class="line">  <span class="keyword">var</span> e <span class="typename">int</span></span><br><span class="line">  ko := <span class="constant">true</span> <span class="comment">//标记</span></span><br><span class="line">  <span class="keyword">for</span> &#123;</span><br><span class="line">    <span class="keyword">select</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> e, ok = &lt;-ch11:</span><br><span class="line">      <span class="keyword">if</span> !ok &#123;</span><br><span class="line">        fmt.Println(<span class="string">"END"</span>)</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        fmt.Println(<span class="string">"%d\n"</span>, e)</span><br><span class="line">      &#125;      </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> !ok &#123;</span><br><span class="line">      <span class="keyword">break</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>单个操作超时触发器<br><figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">go <span class="function"><span class="keyword">func</span><span class="params">()</span> &#123;</span></span><br><span class="line">  var e <span class="built_in">int</span></span><br><span class="line">  ok := <span class="literal">true</span></span><br><span class="line">  <span class="keyword">for</span> &#123;</span><br><span class="line">    <span class="keyword">select</span> &#123;</span><br><span class="line">      <span class="keyword">case</span> e, ok = &lt;-ch11:</span><br><span class="line">      ...</span><br><span class="line">      <span class="keyword">case</span> ok = &lt;-<span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="title">chan</span> <span class="title">bool</span> &#123; //有<span class="title">case</span>被选择之前此语句已经求值为 <span class="title">ok</span> = &lt;-<span class="title">timeout</span></span></span><br><span class="line">                                     //,当<span class="number">1</span>毫秒之内没有<span class="keyword">case</span>执行的话,本<span class="keyword">case</span>会执行,然后超时退出循环</span><br><span class="line">        timeout := make(chan <span class="built_in">int</span>, <span class="number">1</span>)</span><br><span class="line">        go <span class="function"><span class="keyword">func</span><span class="params">()</span> &#123;</span></span><br><span class="line">          time.<span class="built_in">Sleep</span>(time.Millisecond)</span><br><span class="line">          timeout &lt;- <span class="literal">false</span></span><br><span class="line">        &#125;()</span><br><span class="line">        <span class="keyword">return</span> timeout</span><br><span class="line">      &#125;():</span><br><span class="line">        fmt.Println(<span class="string">"Timeout"</span>)</span><br><span class="line">        <span class="built_in">break</span>       </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> !ok &#123;</span><br><span class="line">      <span class="built_in">break</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="非缓冲通道">非缓冲通道</h2><p>重要特性:</p>
+<ol>
+<li>只有一对发送和接受操作”配对”之后,数据才会开始传输,在此之前的操作都是阻塞的</li>
+<li>发送操作晚于接受操作完成,以确保至少有一个接收方正确接受到数据<br>判断一个通道是否是缓冲类型,使用<strong>cap</strong>方法,非缓冲通道返回0</li>
+</ol>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/concurrency/" rel="tag">#concurrency</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/03/30/ANTLR4学习笔记-语法字典-Grammar-Lexicon/" rel="prev">ANTLR4学习笔记</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/12/15/golang-RPC/" rel="next">CMU.Distributed-System.Lab1(RPC)</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            本站概覽
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/img/images.jpg" alt="Yijun" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Yijun</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">coding | java | life</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">文章</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">分類</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">標籤</span>
+              
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/yijun1171" target="_blank">Github</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#golang并发编程学习笔记"><span class="nav-number">1.</span> <span class="nav-text">golang并发编程学习笔记</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Goroutine"><span class="nav-number">2.</span> <span class="nav-text">Goroutine</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用方法"><span class="nav-number">2.1.</span> <span class="nav-text">使用方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#channel"><span class="nav-number">3.</span> <span class="nav-text">channel</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#声明"><span class="nav-number">3.1.</span> <span class="nav-text">声明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#操作"><span class="nav-number">3.2.</span> <span class="nav-text">操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化"><span class="nav-number">3.3.</span> <span class="nav-text">初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关闭"><span class="nav-number">3.4.</span> <span class="nav-text">关闭</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#select语句"><span class="nav-number">3.5.</span> <span class="nav-text">select语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非缓冲通道"><span class="nav-number">3.6.</span> <span class="nav-text">非缓冲通道</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp; 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yijun</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 強力驅動
+</div>
+
+<div class="theme-info">
+  主題 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+    
+
+  
+
+
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
