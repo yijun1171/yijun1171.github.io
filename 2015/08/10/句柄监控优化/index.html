@@ -30,7 +30,7 @@
 
 
 
-  <meta name="keywords" content="linux shell," />
+  <meta name="keywords" content="linux," />
 
 
 
@@ -47,7 +47,7 @@
 <meta property="og:description" content="脚本1lsof -n | awk &amp;#39;&amp;#123;print $2&amp;#34;_&amp;#34;$3&amp;#125;&amp;#39;|sort|uniq -c &amp;#62; pid_fds &amp;#10;&amp;#10;ps aux | grep &amp;#34;\-Dcatalina.home=/home\|ACE\-uWSG\|php\-fpm&amp;#34;|grep -v &amp;#34;grep&amp;#34; | awk &amp;#39;">
 <meta property="og:image" content="http://gtms02.alicdn.com/tps/i2/TB1kT3xIpXXXXXdapXXTKgvNFXX-581-419.gif">
 <meta property="og:image" content="http://gtms01.alicdn.com/tps/i1/TB1FF3vIFXXXXXOXVXXeOiDRFXX-1161-477.jpg">
-<meta property="og:updated_time" content="2015-09-10T06:36:35.838Z">
+<meta property="og:updated_time" content="2015-09-10T06:42:05.122Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="句柄监控优化">
 <meta name="twitter:description" content="脚本1lsof -n | awk &amp;#39;&amp;#123;print $2&amp;#34;_&amp;#34;$3&amp;#125;&amp;#39;|sort|uniq -c &amp;#62; pid_fds &amp;#10;&amp;#10;ps aux | grep &amp;#34;\-Dcatalina.home=/home\|ACE\-uWSG\|php\-fpm&amp;#34;|grep -v &amp;#34;grep&amp;#34; | awk &amp;#39;">
@@ -218,7 +218,7 @@
 <p>from–<a href="http://www.opensource.apple.com/source/lsof/lsof-8/lsof/00PORTING" target="_blank" rel="external">Guide to Porting lsof 4 to Unix OS Dialects</a></p>
 <p>根据参考资料，<em>lsof</em> 通过读取内核中的 <em>proc</em> 数据结构，并根据他们去获取用户的相关信息，然后读取存储在用户数据结构中的句柄信息。<br><img src="http://gtms02.alicdn.com/tps/i2/TB1kT3xIpXXXXXdapXXTKgvNFXX-581-419.gif" alt="进程相关data_structure"></p>
 <p>实际上句柄就是上图中fd_array的 <strong>下标</strong> ，如果某个进程打开了某个”文件”，对应的数组元素就会指向其文件的元信息。</p>
-<h3 id="3-lsof_和_/proc/pid/fd">3.lsof 和 /proc/pid/fd</h3><p>师兄给出了两个他曾经考虑过的方案</p>
+<h3 id="优化方案">优化方案</h3><p>师兄给出了两个他曾经考虑过的方案</p>
 <ul>
 <li>lsof -p pid</li>
 <li>ls /proc/pid/fd</li>
@@ -230,7 +230,7 @@
 <p>用 <em>Beyond Compare</em> 进行比对，发现了以下情况<br><img src="http://gtms01.alicdn.com/tps/i1/TB1FF3vIFXXXXXOXVXXeOiDRFXX-1161-477.jpg" alt=""></p>
 <p>左边是proc/pid/fd的结果，右边是lsof命令的结果</p>
 <ol>
-<li>lsof除了列出该进程对所有jar包的访问而产生的句柄外，还列出了同一个jar包作为共享库的信息。（我将句柄类型输出到了右边的末尾，mem就表示内存映射的句柄）</li>
+<li>lsof除了列出该进程对所有jar包的访问而产生的句柄外，还列出了同一个jar包作为共享库的句柄。（我将句柄类型输出到了右边的末尾，mem就表示内存映射的句柄）</li>
 <li>除此之外，lsof还列出了以 <em>.so</em> 结尾的库文件</li>
 </ol>
 <p>库文件以内存映射方式加载到内存中，lsof将其又统计了一遍，导致结果数量和proc方式不一致。<br>并且很有意思的是那些mem类型的输出，他们inode的指向和对应句柄的inode指向是一致的，也就是说，他们本质上打开的是同一个文件。<br>因此，将mem类型的输出过滤掉就ok了。</p>
@@ -246,7 +246,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/linux-shell/" rel="tag">#linux shell</a>
+            <a href="/tags/linux/" rel="tag">#linux</a>
           
         </div>
       
@@ -371,7 +371,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#脚本"><span class="nav-number">1.</span> <span class="nav-text">脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lsof"><span class="nav-number">2.</span> <span class="nav-text">lsof</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#工作方式"><span class="nav-number">2.1.</span> <span class="nav-text">工作方式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-lsof_和_/proc/pid/fd"><span class="nav-number">3.</span> <span class="nav-text">3.lsof 和 /proc/pid/fd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#脚本"><span class="nav-number">1.</span> <span class="nav-text">脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lsof"><span class="nav-number">2.</span> <span class="nav-text">lsof</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#工作方式"><span class="nav-number">2.1.</span> <span class="nav-text">工作方式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化方案"><span class="nav-number">3.</span> <span class="nav-text">优化方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
