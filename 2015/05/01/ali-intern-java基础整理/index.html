@@ -39,34 +39,16 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="java基础并发内存模型根据jls中的定义
-
-内存模型描述了一个程序的执行过程是否合法.JMM通过检查一个程序的执行链中的读操作和基于该读取操作引起的写操作是否满足指定的规则.
-
-内存模型只是描述了一个程序的行为.只要程序的执行结果可以被内存模型预测,也就是说满足内存模型中的规则,那么程序的指令级优化可以尽可能的减少冗余代码或者乱序执行.
-
-共享变量:实例字段,静态字段,数组的元素.不包括线程私有">
+<meta name="description" content="记录一些java基础的学习笔记">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ali-intern-java基础整理">
 <meta property="og:url" content="http://yijun1171.github.io/2015/05/01/ali-intern-java基础整理/index.html">
 <meta property="og:site_name" content="Eden">
-<meta property="og:description" content="java基础并发内存模型根据jls中的定义
-
-内存模型描述了一个程序的执行过程是否合法.JMM通过检查一个程序的执行链中的读操作和基于该读取操作引起的写操作是否满足指定的规则.
-
-内存模型只是描述了一个程序的行为.只要程序的执行结果可以被内存模型预测,也就是说满足内存模型中的规则,那么程序的指令级优化可以尽可能的减少冗余代码或者乱序执行.
-
-共享变量:实例字段,静态字段,数组的元素.不包括线程私有">
-<meta property="og:updated_time" content="2015-09-07T15:43:39.352Z">
+<meta property="og:description" content="记录一些java基础的学习笔记">
+<meta property="og:updated_time" content="2015-09-10T03:44:48.163Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ali-intern-java基础整理">
-<meta name="twitter:description" content="java基础并发内存模型根据jls中的定义
-
-内存模型描述了一个程序的执行过程是否合法.JMM通过检查一个程序的执行链中的读操作和基于该读取操作引起的写操作是否满足指定的规则.
-
-内存模型只是描述了一个程序的行为.只要程序的执行结果可以被内存模型预测,也就是说满足内存模型中的规则,那么程序的指令级优化可以尽可能的减少冗余代码或者乱序执行.
-
-共享变量:实例字段,静态字段,数组的元素.不包括线程私有">
+<meta name="twitter:description" content="记录一些java基础的学习笔记">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -218,7 +200,9 @@
       
 
       
-        <span itemprop="articleBody"><h1 id="java基础">java基础</h1><h2 id="并发">并发</h2><h3 id="内存模型">内存模型</h3><p>根据jls中的定义</p>
+        <span itemprop="articleBody"><p>记录一些java基础的学习笔记</p>
+<a id="more"></a>
+<h2 id="并发">并发</h2><h3 id="内存模型">内存模型</h3><p>根据jls中的定义</p>
 <blockquote>
 <p>内存模型描述了一个程序的执行过程是否合法.<br>JMM通过检查一个程序的执行链中的<strong>读操作</strong>和基于该读取操作引起的<strong>写操作</strong>是否满足指定的<strong>规则</strong>.</p>
 </blockquote>
@@ -620,7 +604,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#java基础"><span class="nav-number">1.</span> <span class="nav-text">java基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#并发"><span class="nav-number">1.1.</span> <span class="nav-text">并发</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#内存模型"><span class="nav-number">1.1.1.</span> <span class="nav-text">内存模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程"><span class="nav-number">1.1.2.</span> <span class="nav-text">线程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#线程实现"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">线程实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#线程调度"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">线程调度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#线程同步"><span class="nav-number">1.1.2.3.</span> <span class="nav-text">线程同步</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#中断"><span class="nav-number">1.1.2.4.</span> <span class="nav-text">中断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#线程池"><span class="nav-number">1.1.2.5.</span> <span class="nav-text">线程池</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#容器"><span class="nav-number">1.2.</span> <span class="nav-text">容器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#常用容器"><span class="nav-number">1.2.1.</span> <span class="nav-text">常用容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#并发容器(非阻塞)"><span class="nav-number">1.2.2.</span> <span class="nav-text">并发容器(非阻塞)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IO&NIO"><span class="nav-number">1.3.</span> <span class="nav-text">IO&NIO</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IO"><span class="nav-number">1.3.1.</span> <span class="nav-text">IO</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#常见字节流"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">常见字节流</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#常见字符流&字节字符转化接口"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">常见字符流&字节字符转化接口</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NIO"><span class="nav-number">1.3.2.</span> <span class="nav-text">NIO</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Channel"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">Channel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Buffer"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">Buffer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Selector"><span class="nav-number">1.3.2.3.</span> <span class="nav-text">Selector</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存管理和GC"><span class="nav-number">1.4.</span> <span class="nav-text">内存管理和GC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#运行时的数据区"><span class="nav-number">1.4.1.</span> <span class="nav-text">运行时的数据区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HotSpot中的对象"><span class="nav-number">1.4.2.</span> <span class="nav-text">HotSpot中的对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#判断对象存活"><span class="nav-number">1.4.3.</span> <span class="nav-text">判断对象存活</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GC算法"><span class="nav-number">1.4.4.</span> <span class="nav-text">GC算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GC"><span class="nav-number">1.4.5.</span> <span class="nav-text">GC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存分配与回收策略"><span class="nav-number">1.4.6.</span> <span class="nav-text">内存分配与回收策略</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#并发"><span class="nav-number">1.</span> <span class="nav-text">并发</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#内存模型"><span class="nav-number">1.1.</span> <span class="nav-text">内存模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程"><span class="nav-number">1.2.</span> <span class="nav-text">线程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#线程实现"><span class="nav-number">1.2.1.</span> <span class="nav-text">线程实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#线程调度"><span class="nav-number">1.2.2.</span> <span class="nav-text">线程调度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#线程同步"><span class="nav-number">1.2.3.</span> <span class="nav-text">线程同步</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#中断"><span class="nav-number">1.2.4.</span> <span class="nav-text">中断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#线程池"><span class="nav-number">1.2.5.</span> <span class="nav-text">线程池</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#容器"><span class="nav-number">2.</span> <span class="nav-text">容器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#常用容器"><span class="nav-number">2.1.</span> <span class="nav-text">常用容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#并发容器(非阻塞)"><span class="nav-number">2.2.</span> <span class="nav-text">并发容器(非阻塞)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IO&NIO"><span class="nav-number">3.</span> <span class="nav-text">IO&NIO</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IO"><span class="nav-number">3.1.</span> <span class="nav-text">IO</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#常见字节流"><span class="nav-number">3.1.1.</span> <span class="nav-text">常见字节流</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#常见字符流&字节字符转化接口"><span class="nav-number">3.1.2.</span> <span class="nav-text">常见字符流&字节字符转化接口</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NIO"><span class="nav-number">3.2.</span> <span class="nav-text">NIO</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Channel"><span class="nav-number">3.2.1.</span> <span class="nav-text">Channel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Buffer"><span class="nav-number">3.2.2.</span> <span class="nav-text">Buffer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Selector"><span class="nav-number">3.2.3.</span> <span class="nav-text">Selector</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存管理和GC"><span class="nav-number">4.</span> <span class="nav-text">内存管理和GC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#运行时的数据区"><span class="nav-number">4.1.</span> <span class="nav-text">运行时的数据区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HotSpot中的对象"><span class="nav-number">4.2.</span> <span class="nav-text">HotSpot中的对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#判断对象存活"><span class="nav-number">4.3.</span> <span class="nav-text">判断对象存活</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GC算法"><span class="nav-number">4.4.</span> <span class="nav-text">GC算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GC"><span class="nav-number">4.5.</span> <span class="nav-text">GC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存分配与回收策略"><span class="nav-number">4.6.</span> <span class="nav-text">内存分配与回收策略</span></a></li></ol></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
