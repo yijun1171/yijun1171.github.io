@@ -39,16 +39,49 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="阿里巴巴技术论坛(ATF)体验有感">
+<meta name="description" content="系统环境
+淘宝主站
+阿里云
+共享区
+
+整个日志系统是跨机房，跨region搭建的(底层依赖阿里云，对外的开放服务则搭建在淘宝主站)，不同的region之间网络不通（除开放的公网地址），所以存在logService这样具有代理性质的服务组件．
+
+跨网的数据传输会有比较大的延时，这点可以从jstorm的优化看出来
+
+系统角色
+workstation：对外提供服务的界面
+logAgent：VM上的日志采">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ATF-感悟">
-<meta property="og:url" content="http://yijun1171.github.io/2015/05/11/ATF-感悟/index.html">
+<meta property="og:title" content="日志链路健康检查总结">
+<meta property="og:url" content="http://yijun1171.github.io/2015/06/11/日志链路健康检查总结/index.html">
 <meta property="og:site_name" content="Eden">
-<meta property="og:description" content="阿里巴巴技术论坛(ATF)体验有感">
-<meta property="og:updated_time" content="2015-09-10T03:44:25.751Z">
+<meta property="og:description" content="系统环境
+淘宝主站
+阿里云
+共享区
+
+整个日志系统是跨机房，跨region搭建的(底层依赖阿里云，对外的开放服务则搭建在淘宝主站)，不同的region之间网络不通（除开放的公网地址），所以存在logService这样具有代理性质的服务组件．
+
+跨网的数据传输会有比较大的延时，这点可以从jstorm的优化看出来
+
+系统角色
+workstation：对外提供服务的界面
+logAgent：VM上的日志采">
+<meta property="og:updated_time" content="2015-06-14T13:20:46.426Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ATF-感悟">
-<meta name="twitter:description" content="阿里巴巴技术论坛(ATF)体验有感">
+<meta name="twitter:title" content="日志链路健康检查总结">
+<meta name="twitter:description" content="系统环境
+淘宝主站
+阿里云
+共享区
+
+整个日志系统是跨机房，跨region搭建的(底层依赖阿里云，对外的开放服务则搭建在淘宝主站)，不同的region之间网络不通（除开放的公网地址），所以存在logService这样具有代理性质的服务组件．
+
+跨网的数据传输会有比较大的延时，这点可以从jstorm的优化看出来
+
+系统角色
+workstation：对外提供服务的界面
+logAgent：VM上的日志采">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -58,7 +91,7 @@
   };
 </script>
 
-  <title> ATF-感悟 | Eden </title>
+  <title> 日志链路健康检查总结 | Eden </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -157,7 +190,7 @@
           
           
             
-              ATF-感悟
+              日志链路健康检查总结
             
           
         </h1>
@@ -166,8 +199,8 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2015-05-11T21:24:51+08:00" content="2015-05-11">
-            2015-05-11
+          <time itemprop="dateCreated" datetime="2015-06-11T23:54:37+08:00" content="2015-06-11">
+            2015-06-11
           </time>
         </span>
 
@@ -185,49 +218,78 @@
       
 
       
-        <span itemprop="articleBody"><h1 id="阿里巴巴技术论坛(ATF)体验有感">阿里巴巴技术论坛(ATF)体验有感</h1><a id="more"></a>
-<p>4月22日 , 从大连坐着动车到北邮参加了ATF , 准确的说是参观了<strong>技术展区</strong> , 在此记录下自己的感受.</p>
-<h2 id="技术展区">技术展区</h2><p>参展的技术主要包括:</p>
-<ol>
-<li>电商(淘系,天猫)<ul>
-<li>天猫新风尚.利用增强现实改进用户交互.</li>
-<li>拍立淘. 利用图片搜索创造新的流量入口.</li>
-<li>地理围栏. LBS为线下商家和消费者提供了新的交互模式.</li>
-<li>智能聊天机器人. 数据挖掘,降低集团和商家的人工服务成本.</li>
-</ul>
-</li>
-<li>云服务(阿里云)<ul>
-<li>飞天平台(ODPS). 开放的计算平台</li>
-<li>云盾. 为阿里集团和第三方提供安全服务</li>
-</ul>
-</li>
-<li>互联网金融(蚂蚁金服)<ul>
-<li>新的支付方式.模式识别-面部,掌纹,字迹.</li>
-</ul>
-</li>
-<li>数据服务(阿里妈妈)<ul>
-<li>DMP.</li>
-</ul>
-</li>
-<li>物流(菜鸟网络)</li>
+        <span itemprop="articleBody"><h2 id="系统环境">系统环境</h2><ol>
+<li>淘宝主站</li>
+<li>阿里云</li>
+<li>共享区</li>
 </ol>
-<h2 id="体悟">体悟</h2><ol>
-<li>对技术又有了更深切的认识.阿里巴巴商业化的技术产品,例如飞天平台,OceanBase,云盾,无一不是业务自身发展带来的技术挑战下的产物 . <strong>业务驱动技术</strong>是工程师首先应该端正的观点.在企业里, 不是说造轮子就造轮子 , 轮子都是需求拿着鞭子赶出来的 . 有一天轮子造大了 , 发现它不止能载着自己的马车跑 , 还能租出去载着其他企业一起跑 , 顺便还能收收租金.</li>
-<li>对产品有了更全面的看法. 如果现在让我来看一个互联网产品 , 我可能会从以下几个角度去看.<ul>
-<li>表现形式:提供的是服务 , 还是满足生活需求.</li>
-<li>用户群体:是个体用户 , 还是企业 , 政府 , 机构</li>
-<li>它解决什么样的问题:依靠竞品分析 , 用户调研去挖掘产品的核心功能</li>
-<li>它的盈利模式是什么: 看不到利润的东西 , 商人永远不会去做.<br>解决用户的痛点, 永远是产品的核心 . 盈利模式则支撑着产品能不能运营下去.</li>
-</ul>
-</li>
-<li>如何衡量正确性?<ul>
-<li>算法可以依靠数学分析 , 严格证明</li>
-<li>技术产品可以通过测试 , 检验功能和性能是否满足指标来判断</li>
-<li>商业产品依靠市场(占有率)和盈利来检验</li>
-</ul>
-</li>
-<li>无论是做技术, 做产品还是与人沟通表达观点, 尽量做到有理有据.(沟通技巧不在此讨论范围:)</li>
+<p>整个日志系统是跨机房，跨region搭建的(底层依赖<strong>阿里云</strong>，对外的开放服务则搭建在<strong>淘宝主站</strong>)，不同的region之间网络不通（除开放的公网地址），所以存在logService这样具有<strong>代理</strong>性质的服务组件．</p>
+<blockquote>
+<p>跨网的数据传输会有比较大的延时，这点可以从jstorm的优化看出来</p>
+</blockquote>
+<h2 id="系统角色">系统角色</h2><ol>
+<li>workstation：对外提供服务的<strong>界面</strong></li>
+<li>logAgent：VM上的日志采集进程，也是日志链路的起点</li>
+<li>logService：跨Region提供日志服务的代理</li>
+<li>jstorm：实时计算处理集群,按一定规则将所有的日志进行封包,保证日志的<strong>局部有序</strong>和<strong>不丢失</strong>，同时将处理好的日志写入SLS</li>
+<li>ONS：提供消息服务，暂存未处理的日志和实时日志</li>
+<li>SLS：提供查询日志服务<h2 id="设计">设计</h2></li>
 </ol>
+<p>本监控项共覆盖四条日志链路,包括<strong>应用查询日志</strong>,<strong>应用实时日志</strong>,<strong>访问查询日志</strong>,<strong>访问实时日志</strong>，主要完成的功能是检查日志链路的<strong>源端</strong>和<strong>尾端</strong>会不会存在日志丢包，方便日后日志问题的定位．</p>
+<h3 id="业务逻辑">业务逻辑</h3><ol>
+<li><p>部署一个WEB应用(以下称为<strong>目标应用</strong>)在容器中，监控项定时向WEB应用暴露出的URL发送HTTP请求.</p>
+<ul>
+<li>/print，负责打印指定数量的日志．这部分产生的日志属于应用日志，通过我们自己实现的<strong>LogAppender</strong>将日志信息写入容器所在vm．</li>
+<li>/acess, 一个空白URL，没有实际操作，接入层的Nginx记录URL请求，并产生访问日志.</li>
+</ul>
+</li>
+<li><p>在监控项中,采集日志链路终端的数据，检查是否丢失日志</p>
+<ul>
+<li>通过SLS提供的接口检查是不是所有的日志都被成功持久化</li>
+<li>通过<strong>jaeLogService</strong>提过的代理服务，取到ONS中的实时日志，检查是不是所有的日志都能被成功写入．</li>
+</ul>
+</li>
+</ol>
+<h3 id="模块设计">模块设计</h3><p>遵循现有监控项的设计,总体业务逻辑分为三部分:<strong>Collector</strong>,<strong>Processor</strong>,<strong>Strategy</strong>.数据以<strong>MonitorItem</strong>对象的形式在三部分组成的<strong>流水线</strong>中流动.典型的链式程序设计.</p>
+<h4 id="Collector">Collector</h4><p>监控数据的产生起点,根据业务要求从不同的地方收集监控数据,将达到报警要求的数据封装成<strong>MonitorItem</strong>交给下一级.</p>
+<h4 id="Processor">Processor</h4><p>向<strong>Collector</strong>产生的报警项中按业务要求写入对应的报警信息,然后传递给下一级</p>
+<h4 id="Strategy">Strategy</h4><p>将<strong>Processor</strong>传递过来的报警项存入DB</p>
+<p>纵观三个过程,<strong>Collector</strong>是最核心的部分,它决定了监控的数据收集策略,判断是否达到报警阈值,封装报警数据.它也是和外部系统打交道最多的模块.</p>
+<blockquote>
+<p>顺便说一下,项目组依赖的外部系统真的非常多,尤其是对<strong>阿里云</strong>的依赖.整个容器建立在<strong>ACE</strong>的VM上(这也是大部分监控数据的来源),KV缓存使用<strong>OCS</strong>,日志的持久化存储使用<strong>SLS</strong>,利用<strong>ONS</strong>消息服务提供实时日志服务，利用<strong>alimonitor</strong>完成监控报警(报警通知到手机，邮件，旺旺等)</p>
+</blockquote>
+<h2 id="遇到的问题">遇到的问题</h2><ol>
+<li>最开始写代码的时候只要求覆盖一条日志链路，没有考虑扩展性，导致后来添加日志链路的时候进行了代码重构．</li>
+<li>实时日志查询丢包问题．<ul>
+<li>实时日志是经Jstorm封包(<strong>所有</strong>容器日志和访问日志)处理后，存入ONS，供LogService拉取，并对workstation提供服务．关键在LogService的日志拉取策略,第一次拉取是从队尾(ONS可以简单视为队列模型)向前追溯10个日志包，以此作为实时日志在队列中的的<strong>起始偏移量</strong>．日志拉取后，偏移量增加并存入OCS</li>
+<li>问题出在我的<strong>日志采集策略</strong>和起始偏移量的<strong>向前追溯</strong>.<ul>
+<li>采集策略：目标应用产生日志-&gt;采集实时日志-&gt;等待日志写入SLS-&gt;采集查询日志</li>
+<li>向前追溯：很可能由于日志量过大,导致一部分包含<strong>目标应用</strong>相关日志的包写入ONS后,大量的包紧随其后,仅仅向前追溯10个包，不能保证起始偏移量在所有<strong>目标日志包</strong>之前.所以会出现实时日志丢失</li>
+</ul>
+</li>
+<li>改变采集策略<ul>
+<li>线上的实时日志应用场景一般是这样：用户需要查看实时日志定位问题-&gt;打开实时日志(logService将起始偏移量定位好)-&gt;用户进行某些产生日志的操作-&gt;日志封包进入ONS队尾(这时可以保证偏移量一定在所有<strong>目标日志包</strong>之前)-&gt;拉取实时日志</li>
+<li>因此，采集策略改为：打开实时日志采集开关(先定位起始偏移量)-&gt;产生目标日志-&gt;等待日志写入SLS-&gt;采集查询日志</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>二套环境自动同步主干代码，导致同样的操作会执行两次，干扰线上日志正常采集．主要原因还是没有将<strong>产生日志</strong>这些关键性操作设计成<strong>幂等</strong>操作．以后要多注意．</li>
+<li>沟通与协作．依赖的外部系统多，架构复杂，必然需要经常和其他部门和师兄沟通．难免会出现诸多问题．以后要勇于<strong>礼貌且合理</strong>地向外寻求协助</li>
+</ol>
+<h2 id="感悟">感悟</h2><ol>
+<li>熟悉了整个<strong>日志链路</strong>和大致的处理过程</li>
+<li>以后设计程序的时候先尽量明确完整的需求，充分考虑扩展的问题，<strong>面向抽象</strong>去设计，并多注意模块的高内聚，低耦合．</li>
+<li>合理地<strong>处理异常</strong>．工程代码一定要保证<strong>稳定</strong>和<strong>可靠</strong>．要注意不能出现异常导致程序crash的情况．<ul>
+<li>能处理的异常一定要处理，不能处理的向上抛出</li>
+<li>结合日志帮助错误定位</li>
+<li>注意RuntimeException也要捕获</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>感谢师兄们耐心的帮助．：）</p>
+</blockquote>
 </span>
       
     </div>
@@ -239,13 +301,13 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/06/11/日志链路健康检查总结/" rel="prev">日志链路健康检查总结</a>
+              <a href="/2015/09/09/实习总结/" rel="prev">实习总结</a>
             
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/05/09/ali-intern-linux-TCP/" rel="next">ali-intern-linux&TCP</a>
+              <a href="/2015/05/11/ATF-感悟/" rel="next">ATF-感悟</a>
             
           </div>
         </div>
@@ -355,7 +417,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#阿里巴巴技术论坛(ATF)体验有感"><span class="nav-number">1.</span> <span class="nav-text">阿里巴巴技术论坛(ATF)体验有感</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#技术展区"><span class="nav-number">1.1.</span> <span class="nav-text">技术展区</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#体悟"><span class="nav-number">1.2.</span> <span class="nav-text">体悟</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#系统环境"><span class="nav-number">1.</span> <span class="nav-text">系统环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#系统角色"><span class="nav-number">2.</span> <span class="nav-text">系统角色</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设计"><span class="nav-number">3.</span> <span class="nav-text">设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#业务逻辑"><span class="nav-number">3.1.</span> <span class="nav-text">业务逻辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#模块设计"><span class="nav-number">3.2.</span> <span class="nav-text">模块设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Collector"><span class="nav-number">3.2.1.</span> <span class="nav-text">Collector</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Processor"><span class="nav-number">3.2.2.</span> <span class="nav-text">Processor</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Strategy"><span class="nav-number">3.2.3.</span> <span class="nav-text">Strategy</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#遇到的问题"><span class="nav-number">4.</span> <span class="nav-text">遇到的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#感悟"><span class="nav-number">5.</span> <span class="nav-text">感悟</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
