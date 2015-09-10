@@ -30,7 +30,7 @@
 
 
 
-  <meta name="keywords" content="linux, kernel," />
+  <meta name="keywords" content="linux," />
 
 
 
@@ -51,9 +51,9 @@ Linux中线程实现为一种特殊的进程，通过和进程类似的创建方
 进">
 <meta property="og:image" content="http://yijun1171.github.io/img/process-address-space.jpg">
 <meta property="og:image" content="http://yijun1171.github.io/img/slab.gif">
-<meta property="og:image" content="http://yijun1171.github.io/img/Pace-cache.jpg">
+<meta property="og:image" content="http://yijun1171.github.io/img/Page-cache.jpg">
 <meta property="og:image" content="http://yijun1171.github.io/img/linux-io-stack-diagram_v0.11-724x1024.jpg">
-<meta property="og:updated_time" content="2015-09-10T08:52:34.418Z">
+<meta property="og:updated_time" content="2015-09-10T08:59:08.302Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="《Linux内核设计与实现》读书笔记">
 <meta name="twitter:description" content="《Linux内核设计与实现》读书笔记进程管理进程相关的资源描述都保存在 task_struct 结构中， task_struct 的创建和销毁是有slab分配器管理的，同时利用 写时复制 技术，最大限度的减小进程创建的开销
@@ -245,7 +245,7 @@ Linux中线程实现为一种特殊的进程，通过和进程类似的创建方
 <li>CFQ：为每个进程划分请求队列，轮训调度，保证高负荷的情况下也有很好的表现</li>
 <li>Noop：只做合并不做排序，使用与随机读写设备。如SSD</li>
 </ol>
-<h4 id="页缓存和回写">页缓存和回写</h4><p>页缓存是在磁盘之上的一层内存缓存，顾名思义是以页面为单位的。<br>读命中，直接从页缓存中取数据；未命中则去磁盘请求，然后更新缓存。<br><img src="/img/Pace-cache.jpg" alt=""></p>
+<h4 id="页缓存和回写">页缓存和回写</h4><p>页缓存是在磁盘之上的一层内存缓存，顾名思义是以页面为单位的。<br>读命中，直接从页缓存中取数据；未命中则去磁盘请求，然后更新缓存。<br><img src="/img/Page-cache.jpg" alt=""></p>
 <p>主要的写策略有3种</p>
 <ol>
 <li>缓存穿透，不使用缓存，直接写磁盘</li>
@@ -269,7 +269,7 @@ Linux中线程实现为一种特殊的进程，通过和进程类似的创建方
       
         <div class="post-tags">
           
-            <a href="/tags/linux-kernel/" rel="tag">#linux, kernel</a>
+            <a href="/tags/linux/" rel="tag">#linux</a>
           
         </div>
       
@@ -358,7 +358,7 @@ Linux中线程实现为一种特殊的进程，通过和进程类似的创建方
 
           <div class="site-state-item site-state-tags">
             
-              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-count">6</span>
               <span class="site-state-item-name">标签</span>
               
           </div>
