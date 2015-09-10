@@ -254,6 +254,118 @@
           
           
             
+              <a class="post-title-link" href="/2015/08/10/句柄监控优化/" itemprop="url">
+                句柄监控优化
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2015-08-10T14:23:35+08:00" content="2015-08-10">
+            2015-08-10
+          </time>
+        </span>
+
+        
+
+        
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody"><h3 id="脚本">脚本</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsof -n | awk &#39;&#123;print $2&#34;_&#34;$3&#125;&#39;|sort|uniq -c &#62; pid_fds &#10;&#10;ps aux | grep &#34;\-Dcatalina.home=/home\|ACE\-uWSG\|php\-fpm&#34;|grep -v &#34;grep&#34; | awk &#39;&#123;print $2&#34;_&#34;$1&#125;&#39; &#62; pids&#10;&#10;for pid in `cat pids`&#10;do&#10;  echo `grep &#34;$pid&#34;  `&#10;done</span><br></pre></td></tr></table></figure>
+<p>这是VM虚拟机上句柄监控的采集脚本，主要目的是统计以下三个进程打开的句柄数量</p>
+<ul>
+<li>-Dcatalina.home=/home</li>
+<li>ACE-uWSG</li>
+<li>php-fpm</li>
+</ul>
+<p>线上进行链路压测时发现，这段脚本的执行会导致CPU负载飙升。</p>
+<h3 id="lsof">lsof</h3><p><em>lsof</em> 是一个很常用的问题排查工具，它能列出系统中打开的文件句柄。</p>
+<blockquote>
+<p>Lsof revision 4.78 lists information about files opened by processes.</p>
+<p>An open file may be a regular file, a directory, a block special file, a character special file, an executing text reference, a library, a stream or a network file  (Internet socket, NFS file or UNIX domain socket.)</p>
+</blockquote>
+<p>这是man手册中对lsof的描述，文件句柄可能包括：</p>
+<ul>
+<li>普通文件</li>
+<li>目录</li>
+<li>块文件（块设备）</li>
+<li>字符文件（字符设备）</li>
+<li>正在执行中的文件的引用</li>
+<li>库</li>
+<li>流</li>
+<li>socket和NFS</li>
+</ul>
+<p>linux中一切都是文件 : )<br>我们可以通过指定参数，展示某些具体进程或者目录下打开的句柄（-p +d），具体使用方法参考这篇文档，不再赘述。<a href="http://www.thegeekstuff.com/2012/08/lsof-command-examples/" target="_blank" rel="external">15 Linux lsof Command Examples </a></p>
+<h4 id="工作方式">工作方式</h4><blockquote>
+<p>Lsof obtains data about open UNIX dialect files by reading the kernel’s proc structure information, following it to the related user structure, then reading the open file structures stored (usually) in the user structure.  Typically lsof uses the kernel memory devices, /dev/kmem, /dev/mem, etc. to read kernel data.</p>
+</blockquote>
+<p>from–<a href="http://www.opensource.apple.com/source/lsof/lsof-8/lsof/00PORTING" target="_blank" rel="external">Guide to Porting lsof 4 to Unix OS Dialects</a></p>
+<p>根据参考资料，<em>lsof</em> 通过读取内核中的 <em>proc</em> 数据结构，并根据他们去获取用户的相关信息，然后读取存储在用户数据结构中的句柄信息。<br><img src="http://gtms02.alicdn.com/tps/i2/TB1kT3xIpXXXXXdapXXTKgvNFXX-581-419.gif" alt="进程相关data_structure"></p>
+<p>实际上句柄就是上图中fd_array的 <strong>下标</strong> ，如果某个进程打开了某个”文件”，对应的数组元素就会指向其文件的元信息。</p>
+<h3 id="3-lsof_和_/proc/pid/fd">3.lsof 和 /proc/pid/fd</h3><p>师兄给出了两个他曾经考虑过的方案</p>
+<ul>
+<li>lsof -p pid</li>
+<li>ls /proc/pid/fd</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsof -p pid | wc -l&#10;&#10;--------------------------&#10;&#10;ls -l /proc/pid/fd | wc -l&#10;&#10;&#32467;&#26524; 497 : 298</span><br></pre></td></tr></table></figure>
+<p>然而问题发生了，查看同一个进程打开的句柄，两种方案给出的执行结果却不一样。lsof命令的执行结果比另一个方案，多出好几百条句柄。</p>
+<p>我试着把两种方案的结果dump到本地</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsof -n -p 165926 | awk &#39;&#123;if($5==&#34;REG&#34;) print $9&#34;_&#34;$8&#34;_&#34;$4;else print $8&#34;_&#34;$7&#34;_&#34;$4&#125;&#39; | sort &#62; fd_lsof&#10;&#10;ls -il /proc/165926/fd |grep -v &#34;total&#34;| awk &#39;&#123;print $12&#34;_&#34;$1&#125;&#39; | sort &#62; fd_proc</span><br></pre></td></tr></table></figure>
+<p>用 <em>Beyond Compare</em> 进行比对，发现了以下情况<br><img src="http://gtms01.alicdn.com/tps/i1/TB1FF3vIFXXXXXOXVXXeOiDRFXX-1161-477.jpg" alt=""></p>
+<p>左边是proc/pid/fd的结果，右边是lsof命令的结果</p>
+<ol>
+<li>lsof除了列出该进程对所有jar包的访问而产生的句柄外，还列出了同一个jar包作为共享库的信息。（我将句柄类型输出到了右边的末尾，mem就表示内存映射的句柄）</li>
+<li>除此之外，lsof还列出了以 <em>.so</em> 结尾的库文件</li>
+</ol>
+<p>库文件以内存映射方式加载到内存中，lsof将其又统计了一遍，导致结果数量和proc方式不一致。<br>并且很有意思的是那些mem类型的输出，他们inode的指向和对应句柄的inode指向是一致的，也就是说，他们本质上打开的是同一个文件。<br>因此，将mem类型的输出过滤掉就ok了。</p>
+<h3 id="参考资料">参考资料</h3><ol>
+<li><a href="http://www.thegeekstuff.com/2012/08/lsof-command-examples/" target="_blank" rel="external">15 Linux lsof Command Examples </a></li>
+<li><a href="http://www.opensource.apple.com/source/lsof/lsof-8/lsof/00PORTING" target="_blank" rel="external">how lsof works</a></li>
+</ol>
+</span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
               <a class="post-title-link" href="/2015/06/11/日志链路健康检查总结/" itemprop="url">
                 日志链路健康检查总结
               </a>
@@ -928,87 +1040,6 @@
 
 
     
-      
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      
-      
-        <h1 class="post-title" itemprop="name headline">
-          
-          
-            
-              <a class="post-title-link" href="/2014/12/08/Lucene学习笔记-四-并发/" itemprop="url">
-                Lucene学习笔记(四)并发
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          发表于
-          <time itemprop="dateCreated" datetime="2014-12-08T12:49:35+08:00" content="2014-12-08">
-            2014-12-08
-          </time>
-        </span>
-
-        
-          <span class="post-category" >
-            &nbsp; | &nbsp; 分类于
-            
-              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/java/" itemprop="url" rel="index">
-                  <span itemprop="name">java</span>
-                </a>
-              </span>
-
-              
-              
-
-            
-          </span>
-        
-
-        
-          
-        
-      </div>
-    </header>
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <h1 id="并发,线程安全及锁">并发,线程安全及锁</h1><p>索引文件的并发访问,Reader和Writer的线程安全性,以及Lucene实现前两项内容的锁机制<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2014/12/08/Lucene学习笔记-四-并发/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1047,7 +1078,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">13</span>
+              <span class="site-state-item-count">14</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1061,7 +1092,7 @@
 
           <div class="site-state-item site-state-tags">
             
-              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-count">6</span>
               <span class="site-state-item-name">标签</span>
               
           </div>
